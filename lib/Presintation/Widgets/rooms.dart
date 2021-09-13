@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:news_feed/Data/Models/user_model.dart';
 import 'package:news_feed/Presintation/Widgets/profile_avatar.dart';
 
-import 'create_room_buttom.dart';
+import 'create_room_button.dart';
 class Rooms extends StatelessWidget {
   final List<User>? onlineUsers;
 
