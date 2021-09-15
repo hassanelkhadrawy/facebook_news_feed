@@ -12,7 +12,6 @@ dependencies:
   flutter_bloc: ^7.0.1
   material_design_icons_flutter: ^4.0.5955
   cached_network_image: ^3.1.0
-  responsive_framework: ^0.1.4
 
 dev_dependencies:
   flutter_test:
