@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:news_feed/Data/Models/post_model.dart';
+import 'package:news_feed/Presintation/Widgets/Responsive.dart';
 import 'package:news_feed/Presintation/Widgets/post_header.dart';
 import 'package:news_feed/Presintation/Widgets/post_images.dart';
 import 'package:news_feed/Presintation/Widgets/post_states.dart';
@@ -14,10 +15,21 @@ class PostContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isWeb = Responsive.isWeb(context);
+
     return Card(
+      margin: EdgeInsets.symmetric(
+        vertical: 5.0,
+        horizontal: isWeb ? 5.0 : 0.0,
+      ),
+      elevation: isWeb ? 1.0 : 0.0,
+      shape: isWeb
+          ? RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0))
+          : null,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         color: Colors.white,
+
         child: Column(
           children: [
             Padding(

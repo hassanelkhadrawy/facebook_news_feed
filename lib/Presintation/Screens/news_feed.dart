@@ -4,7 +4,10 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:news_feed/Data/Models/post_model.dart';
 import 'package:news_feed/Data/WebServicrs/news_feed_web_services.dart';
 import 'package:news_feed/Logic/news_feed_cubit.dart';
+import 'package:news_feed/Presintation/Widgets/Responsive.dart';
 import 'package:news_feed/Presintation/Widgets/circle_button.dart';
+import 'package:news_feed/Presintation/Widgets/contacts_list.dart';
+import 'package:news_feed/Presintation/Widgets/more_options_list.dart';
 import 'package:news_feed/Presintation/Widgets/post_container.dart';
 import 'package:news_feed/Presintation/Widgets/upload_post_container.dart';
 import 'package:news_feed/Presintation/Widgets/rooms.dart';
@@ -19,15 +22,17 @@ class NewsFeed extends StatefulWidget {
 }
 
 class _NewsFeedState extends State<NewsFeed> {
-   List<Post>? post;
-  Widget buildWidgets() {
+  List<Post>? post;
+  final TrackingScrollController _trackingScrollController =
+      TrackingScrollController();
+  Widget buildMobileWidgets() {
     return BlocProvider(
       create: (BuildContext context) => NewsFeedCubit(NewsFeedWebSrevice()),
       child: BlocConsumer<NewsFeedCubit, NewsFeedState>(
-        listener: (context, state) {
-        },
+        listener: (context, state) {},
         builder: (context, state) {
           return CustomScrollView(
+            controller: _trackingScrollController,
             slivers: [
               SliverAppBar(
                 brightness: Brightness.light,
@@ -63,7 +68,8 @@ class _NewsFeedState extends State<NewsFeed> {
               SliverPadding(
                 padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
                 sliver: SliverToBoxAdapter(
-                  child: Rooms(onlineUsers: NewsFeedCubit.get(context).getOnlineUsets()),
+                  child: Rooms(
+                      onlineUsers: NewsFeedCubit.get(context).getOnlineUsets()),
                 ),
               ),
               SliverPadding(
@@ -76,16 +82,93 @@ class _NewsFeedState extends State<NewsFeed> {
                 ),
               ),
               SliverList(
-
                 delegate: SliverChildBuilderDelegate(
-                      (context, index) {
-                       post = NewsFeedCubit.get(context).getUsersPosts();
+                  (context, index) {
+                    post = NewsFeedCubit.get(context).getUsersPosts();
                     return PostContainer(post: post![index]);
                   },
                   childCount: post?.length,
                 ),
               ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
+  Widget build_Web_Widgets() {
+    return BlocProvider(
+      create: (BuildContext context) => NewsFeedCubit(NewsFeedWebSrevice()),
+      child: BlocConsumer<NewsFeedCubit, NewsFeedState>(
+        listener: (context, state) {},
+        builder: (context, state) {
+          return Row(
+            children: [
+              Flexible(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: MoreOptionsList(
+                      currentUser:
+                          NewsFeedCubit.get(context).getCurentUser()),
+                ),
+              ),
+              const Spacer(),
+              Container(
+                width: 600.0,
+                child: CustomScrollView(
+                  controller: _trackingScrollController,
+
+                  slivers: [
+
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 20.0, 0.0, 10.0),
+                      sliver: SliverToBoxAdapter(
+                        child: Stories(
+                          currentUser:
+                              NewsFeedCubit.get(context).getCurentUser(),
+                          stories: NewsFeedCubit.get(context).getUsersStories(),
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: CreatePostContainer(
+                          currentUser:
+                              NewsFeedCubit.get(context).getCurentUser()),
+                    ),
+                    SliverPadding(
+                      padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 5.0),
+                      sliver: SliverToBoxAdapter(
+                        child: Rooms(
+                            onlineUsers:
+                                NewsFeedCubit.get(context).getOnlineUsets()),
+                      ),
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          post = NewsFeedCubit.get(context).getUsersPosts();
+                          return PostContainer(post: post![index]);
+                        },
+                        childCount: post?.length,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              Flexible(
+                flex: 2,
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: ContactsList(
+                        users: NewsFeedCubit.get(context).getOnlineUsets()),
+                  ),
+                ),
+              ),
             ],
           );
         },
@@ -95,8 +178,14 @@ class _NewsFeedState extends State<NewsFeed> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body:buildWidgets()
-    ) ;
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        body: Responsive(
+          mobile: buildMobileWidgets(),
+          web: build_Web_Widgets(),
+        ),
+      ),
+    );
   }
 }
